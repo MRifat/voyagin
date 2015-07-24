@@ -12,8 +12,8 @@ class ArabicToEnglish
 
   MILLION = 'Million'
 
-  def initialize(number=[])
-    @number ||= number
+  def initialize(number=0)
+    @number ||= number.to_i
   end
 
   def number=(n)
@@ -22,7 +22,8 @@ class ArabicToEnglish
 
 
 
-  def convert(minus)
+  def convert
+    minus = @number < 0
     digits = @number.to_s.split('').map(&:to_i)
     digits.shift if minus
     result = minus ? 'Minus ' : ''
