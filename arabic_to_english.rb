@@ -23,7 +23,7 @@ class ArabicToEnglish
 
 
   def convert(minus)
-    digits = @number.split('').map(&:to_i)
+    digits = @number.to_s.split('').map(&:to_i)
     digits.shift if minus
     result = minus ? 'Minus ' : ''
     case digits.length
