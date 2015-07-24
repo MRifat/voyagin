@@ -12,7 +12,7 @@ class ArabicToEnglish
 
   MILLION = 'Million'
 
-  def initialize(number=0)
+  def initialize(number=[])
     @number ||= number
   end
 
@@ -22,19 +22,21 @@ class ArabicToEnglish
 
 
 
-  def convert(result= '')
-    digits = @number.to_s.split('').map(&:to_i)
+  def convert(minus)
+    digits = @number.split('').map(&:to_i)
+    digits.shift if minus
+    result = minus ? 'Minus ' : ''
     case digits.length
     when 7, 8, 9
-      result = get_millions(digits)
+      result += get_millions(digits)
     when 4, 5, 6
-      result = get_thousands(digits)
+      result += get_thousands(digits)
     when 3
-      result = get_hundreds(digits)
+      result += get_hundreds(digits)
     when 2
-      result = get_tens(digits)
+      result += get_tens(digits)
     when 1
-      result = get_ones(digits[-1])
+      result += get_ones(digits[-1])
     end
     return result.strip.gsub(/\ \ /, ' ')
   end
@@ -52,19 +54,23 @@ class ArabicToEnglish
   end
 
   def get_hundreds(digits)
-    return get_tens(digits) if digits[-3] == 0
-    return ("#{get_ones(digits[-3])} #{HUNDRED} #{get_tens(digits)}")
+    tens = "#{get_tens(digits)}"
+    tens = 'and ' + tens unless tens.empty?
+    return tens if digits[-3] == 0
+    return ("#{get_ones(digits[-3])} #{HUNDRED} #{tens}")
   end
 
   def get_thousands(digits)
-    return ("#{get_hundreds(digits[-6..-4])} #{THOUSAND} #{get_hundreds(digits)}") unless digits[-6].nil?
-    return ("#{get_tens(digits[-5..-4])} #{THOUSAND} #{get_hundreds(digits)}") unless digits[-5].nil?
-    return get_hundreds(digits) if digits[-4] == 0
-    return ("#{get_ones(digits[-4])} #{THOUSAND} #{get_hundreds(digits)}")
+    hundreds = get_hundreds(digits)
+    return ("#{get_hundreds(digits[-6..-4])} #{THOUSAND} #{hundreds}") unless digits[-6].nil?
+    return ("#{get_tens(digits[-5..-4])} #{THOUSAND} #{hundreds}") unless digits[-5].nil?
+    return hundreds(digits) if digits[-4] == 0
+    return ("#{get_ones(digits[-4])} #{THOUSAND} #{hundreds}")
   end
 
   def get_millions(digits)
-    return ("#{get_tens(digits[-8..-7])} #{MILLION} #{get_thousands(digits[-6..-1])}") unless digits[-8].nil?
-    return ("#{get_ones(digits[-7])} #{MILLION} #{get_thousands(digits[-6..-1])}")
+    thousands = get_thousands(digits[-6..-1])
+    return ("#{get_tens(digits[-8..-7])} #{MILLION} #{thousands}") unless digits[-8].nil?
+    return ("#{get_ones(digits[-7])} #{MILLION} #{thousands}")
   end
 end
